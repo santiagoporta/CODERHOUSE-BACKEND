@@ -123,9 +123,19 @@ class Product {
     code: '',
     stock: 25
   });
-  
-  
   console.log(pm.getProducts());
+
+  const updatedProduct = await pm.updateProduct(1, {
+    title: 'Producto actualizado',
+    price: 150,
+  });
+  console.log('Producto actualizado:', updatedProduct);
+
+  const deletedProduct = await pm.deleteProduct(1);
+  console.log('Producto eliminado:', deletedProduct);
+
+  const updatedProducts = await pm.getProducts();
+  console.log('Productos actualizados:', updatedProducts);
 }
 
 main()
