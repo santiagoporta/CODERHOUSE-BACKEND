@@ -1,13 +1,14 @@
 import express from 'express'
-import {ProductManager} from './ProductManager'
+import {ProductManager} from './ProductManager.js'
 
-const productManager = new ProductManager('./db/products.json')
+const productManager = new ProductManager({path:'./db/products.json'})
 
 const app = express()
 
 app.get('/products', async (req, res) => {
     const limit = parseInt(String(req.query.limit))
-    const products = pm.getProducts()
+    if(!limit) return res.send(productManager.readProducts())
+    const products = productManager.getProducts()
     res.json(products.slice(0,limit))
 })
   

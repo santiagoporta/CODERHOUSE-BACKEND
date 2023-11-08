@@ -1,14 +1,14 @@
-const { promises:fs } = require('fs')
+import fs from 'fs/promises'
 
 class Product {
-    constructor(id, title, description, price, thumbnail, stock, code) {
-        this.id = id ?? getNewProductId();
-        this.title = title;
-        this.description = description;
-        this.price = price;
-        this.thumbnail = thumbnail;
-        this.code = code ?? this.generarCodeAlAzar();
-        this.stock = stock ?? 50;
+    constructor(product) {
+        this.id = product.id;
+        this.title = product.title;
+        this.description = product.description;
+        this.price = product.price;
+        this.thumbnail = product.thumbnail;
+        this.code = product.code ?? this.generarCodeAlAzar();
+        this.stock = product.stock ?? 50;
     }
   
     generarCodeAlAzar() {
@@ -23,22 +23,24 @@ class Product {
   }
   
   class ProductManager {
+
     #products
 
-    static newProductId = 1
+    static newProductId = 1;
   
     constructor({path}) {
         this.path = path
         this.#products = []
     }
-  
-    async init() {
-        await this.#writeProducts()
-    }
-
     
-    static getNewProductId() {
-        return ProductManager.newProductId++
+         getNewProductId() {
+        if (this.#products.length > 0) {
+          const lastProductId = this.#products[this.#products.length - 1]  
+          return lastProductId.id+1;
+        } else {
+          return 1
+        }
+        
     }
     
     validateProductData(data) {
@@ -54,19 +56,24 @@ class Product {
         }
         
         async #readProducts() {
+          try{
             const productsJSON = await fs.readFile(this.path, 'utf-8')
             this.#products = JSON.parse(productsJSON)
+          } catch (e) {
+            this.#products = await this.#writeProducts();
+          }
         }
         
         async #writeProducts() {
-            await fs.writeFile(this.path, JSON.stringify(this.#products))
+          const json = JSON.stringify(this.#products, null, 2); 
+          await fs.writeFile(this.path, json);
         }
         
         async addProduct(data) {
             this.validateProductData(data);
-            const productId = ProductManager.getNewProductId()
-            const product = new Product( productId, data.title, data.description, data.price, data.thumbnail, data.stock )
             await this.#readProducts()
+            const productId = this.getNewProductId()
+            const product = new Product( productId, data.title, data.description, data.price, data.thumbnail, data.stock )
             this.#products.push(product)
             await this.#writeProducts()
             return product
@@ -81,10 +88,9 @@ class Product {
             await this.#readProducts()
             const index = this.#products.findIndex(u => u.id === id)
             if (index !== -1) {
-              const newProduct = new Product({ id, ...this.#products[index], ...data })
-              this.#products[index] = newProduct
+              this.#products[index] = { ...this.#products[index], ...data }
               await this.#writeProducts()
-              return newProduct
+              return 'Producto Actualizado'
             } else {
               throw new Error('error al actualizar: producto no encontrado')
             }
@@ -110,12 +116,10 @@ class Product {
             
         }
   }
-  
+ 
   async function main() {
   const pm = new ProductManager({path: 'products.json'});
-  await pm.init()
   await pm.addProduct({
-    id: 4,
     title: 'producto prueba',
     description: 'Este es un producto de prueba',
     price: 200,
@@ -123,19 +127,19 @@ class Product {
     code: '',
     stock: 25
   });
-  console.log(pm.getProducts());
+  // console.log(await pm.getProducts());
 
-  const updatedProduct = await pm.updateProduct(1, {
-    title: 'Producto actualizado',
-    price: 150,
-  });
-  console.log('Producto actualizado:', updatedProduct);
+  // const updatedProduct = await pm.updateProduct(2, {
+  //   title: 'Producto actualizado',
+  //   price: 150,
+  // });
+  // console.log('Producto actualizado:', updatedProduct);
 
-  const deletedProduct = await pm.deleteProduct(1);
-  console.log('Producto eliminado:', deletedProduct);
+  // const deletedProduct = await pm.deleteProduct(1);
+  // console.log('Producto eliminado:', deletedProduct);
 
-  const updatedProducts = await pm.getProducts();
-  console.log('Productos actualizados:', updatedProducts);
+  // const updatedProducts = await pm.getProducts();
+  // console.log('Productos actualizados:', updatedProducts);
 }
 
 main()

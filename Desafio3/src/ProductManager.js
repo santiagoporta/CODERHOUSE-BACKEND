@@ -1,22 +1,46 @@
 import fs from 'fs/promises'
 
-export class ProductManager {
+export class Product {
+    constructor(product) {
+        this.id = product.id;
+        this.title = product.title;
+        this.description = product.description;
+        this.price = product.price;
+        this.thumbnail = product.thumbnail;
+        this.code = product.code ?? this.generarCodeAlAzar();
+        this.stock = product.stock ?? 50;
+    }
+  
+    generarCodeAlAzar() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let code = '';
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            code += characters.charAt(randomIndex);
+        }
+        return code;
+    }
+  }
+  
+  export class ProductManager {
+
     #products
 
-    static newProductId = 1
+    static newProductId = 1;
   
-    constructor({path}) {
-        this.path = path
+    constructor(data) {
+        this.path = data.path
         this.#products = []
     }
-  
-    async init() {
-        await this.#writeProducts()
-    }
-
     
-    static getNewProductId() {
-        return ProductManager.newProductId++
+         getNewProductId() {
+        if (this.#products.length > 0) {
+          const lastProductId = this.#products[this.#products.length - 1]  
+          return lastProductId.id+1;
+        } else {
+          return 1
+        }
+        
     }
     
     validateProductData(data) {
@@ -32,19 +56,24 @@ export class ProductManager {
         }
         
         async #readProducts() {
+          try{
             const productsJSON = await fs.readFile(this.path, 'utf-8')
             this.#products = JSON.parse(productsJSON)
+          } catch (e) {
+            this.#products = await this.#writeProducts();
+          }
         }
         
         async #writeProducts() {
-            await fs.writeFile(this.path, JSON.stringify(this.#products))
+          const json = JSON.stringify(this.#products, null, 2); 
+          await fs.writeFile(this.path, json);
         }
         
         async addProduct(data) {
             this.validateProductData(data);
-            const productId = ProductManager.getNewProductId()
-            const product = new Product( productId, data.title, data.description, data.price, data.thumbnail, data.stock )
             await this.#readProducts()
+            const productId = this.getNewProductId()
+            const product = new Product( productId, data.title, data.description, data.price, data.thumbnail, data.stock )
             this.#products.push(product)
             await this.#writeProducts()
             return product
@@ -55,19 +84,13 @@ export class ProductManager {
             return this.#products;
         }
 
-        async getProductsByPrice(){
-            await this.#readProducts()
-            return this.products.filter(p => p.price === price)
-        }
-
         async updateProduct(id, data) {
             await this.#readProducts()
             const index = this.#products.findIndex(u => u.id === id)
             if (index !== -1) {
-              const newProduct = new Product({ id, ...this.#products[index], ...data })
-              this.#products[index] = newProduct
+              this.#products[index] = { ...this.#products[index], ...data }
               await this.#writeProducts()
-              return newProduct
+              return 'Producto Actualizado'
             } else {
               throw new Error('error al actualizar: producto no encontrado')
             }
@@ -85,11 +108,15 @@ export class ProductManager {
             }
           }
 
-        getElementById(productId) {
-            const product = this.#products.find(e => e.id === productId)
-            if(!product) {
-                throw new Error("Producto no encontrado")
+          async getElementById(id) {
+            try {
+                const data = await fs.readFile(this.path, 'utf-8');
+                const products = JSON.parse(data);
+                const foundProduct = products.find(product => product.id === id);
+                return foundProduct;
+            } catch {
+                console.error(`Error al buscar el producto por ID`);
+                return null;
             }
-            
-        }
+        }   
   }
