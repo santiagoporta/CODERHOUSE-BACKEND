@@ -6,11 +6,12 @@ export class CartManager{
     static newCartId = 1
 
     constructor(){
-        this.path = 'cart.json'
+        this.path = 'PrimerPreEntrega/src/cart.json'
         this.carts = []
     }
 
-    getNewCartId() {
+    async getNewCartId() {
+        this.#carts = await this.#readCarts()
         if (this.#carts.length > 0) {
             const lastCartId = this.#carts[this.#carts.length - 1]
             return lastCartId.id + 1;
@@ -41,34 +42,34 @@ export class CartManager{
 
     async getCartProducts(id) {
         const carts = await this.#readCarts()
-        const cart = carts.find(cart => cart.id === id)
+        const cart = carts.find(cart => cart.id === Number(id))
         if(cart){
-            return cart.products
+            return cart
         } else {
             console.log('Carrito no encontrado')
         }
     }
 
     async newCart() {
-        const id = this.getNewCartId()
+        const id = await this.getNewCartId()
         const newCart = {id, products:[]}
-        this.carts = await this.getCarts()
-        this.cart.push(newCart())
+        this.#carts = await this.getCarts()
+        this.#carts.push(newCart())
         await this.#writeCarts()
         return newCart;
     }
 
     async addProductToCart(cart_id,product_id) {
         const carts = await this.getCarts()
-        const index = carts.findIndex(cart => cart.id === cart_id)
+        const index = carts.findIndex(cart => cart.id === Number(cart_id))
         
         if(index !== -1){
-            const cartProducts = await this.getCartProducts(cart_id)
-            const existingProductIndex = cartProducts.findIndex(product => product_id === product_id)
+            const cartProducts = await this.getCartProducts(cart_id);
+            const existingProductIndex = cartProducts.products.findIndex(product => product_id === product_id)
             if(existingProductIndex !== -1){
-                cartProducts[existingProductIndex].quantity = cartProducts[existingProductIndex].quantity + 1
+                cartProducts.products[existingProductIndex].quantity += 1;
             } else {
-                cartProducts.push({product_id, quantity: 1})
+                cartProducts.products.push({id:product_id, quantity: 1});
             }
             carts[index].products = cartProducts
             await this.writeCarts()

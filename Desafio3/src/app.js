@@ -1,14 +1,14 @@
 import express from 'express'
 import {ProductManager} from './ProductManager.js'
 
-const productManager = new ProductManager({path:'./db/products.json'})
+const productManager = new ProductManager({path:'Desafio3/db/products.json'})
 
 const app = express()
 
 app.get('/products', async (req, res) => {
     const limit = parseInt(String(req.query.limit))
     if(!limit) return res.send(productManager.readProducts())
-    const products = productManager.getProducts()
+    const products = await productManager.getProducts()
     res.json(products.slice(0,limit))
 })
   

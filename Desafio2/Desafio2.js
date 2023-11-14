@@ -1,15 +1,15 @@
 import fs from 'fs/promises'
 
 class Product {
-    constructor(product) {
-        this.id = product.id;
-        this.title = product.title;
-        this.description = product.description;
-        this.price = product.price;
-        this.thumbnail = product.thumbnail;
-        this.code = product.code ?? this.generarCodeAlAzar();
-        this.stock = product.stock ?? 50;
-    }
+  constructor(id, title, description, price, thumbnail, code, stock) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.price = price;
+    this.thumbnail = thumbnail;
+    this.code = code ?? this.generarCodeAlAzar();
+    this.stock = stock ?? 50;
+}
   
     generarCodeAlAzar() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

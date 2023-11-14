@@ -1,5 +1,18 @@
 import fs from 'fs/promises'
 
+     class Product {
+    constructor(id, title, description, price, thumbnail, stock, status, category) {
+      this.id = id;
+      this.title = title;
+      this.description = description;
+      this.price = price;
+      this.thumbnail = thumbnail;
+      this.stock = stock;
+      this.status = status;
+      this.category = category;
+  }
+}
+
 export class ProductManager {
 
     #products
@@ -7,7 +20,7 @@ export class ProductManager {
     static newProductId = 1;
   
     constructor() {
-        this.path = 'products.json'
+        this.path = 'PrimerPreEntrega/src/products.json'
         this.#products = []
     }
 
@@ -36,7 +49,7 @@ export class ProductManager {
     async #readProducts() {
         try {
             const productsJSON = await fs.readFile(this.path, 'utf-8')
-            this.#products = JSON.parse(productsJSON)
+            return this.#products = JSON.parse(productsJSON)
         } catch (e) {
             this.#products = await this.#writeProducts();
         }
@@ -64,7 +77,7 @@ export class ProductManager {
 
     async updateProduct(id, data) {
         await this.#readProducts()
-        const index = this.#products.findIndex(u => u.id === id)
+        const index = this.#products.findIndex(u => u.id === Number(id))
         if (index !== -1) {
             this.#products[index] = { ...this.#products[index], ...data }
             await this.#writeProducts()
@@ -76,7 +89,7 @@ export class ProductManager {
 
     async deleteProduct(id) {
         await this.#readProducts()
-        const index = this.#products.findIndex(u => u.id === id)
+        const index = this.#products.findIndex(u => u.id === Number(id))
         if (index !== -1) {
             const deletedProducts = this.#products.splice(index, 1)
             await this.#writeProducts()
