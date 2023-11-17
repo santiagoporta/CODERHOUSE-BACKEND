@@ -99,11 +99,13 @@ export class ProductManager {
         }
     }
 
-    getElementById(productId) {
-        const product = this.#products.find(e => e.id === productId)
+
+    async getElementById(productId) {
+        const data = await this.#readProducts()
+        const product = data.find(e => e.id === Number(productId))
         if (!product) {
             throw new Error("Producto no encontrado")
         }
-
+        return product
     }
 }

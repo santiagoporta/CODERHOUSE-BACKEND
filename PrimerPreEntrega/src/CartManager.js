@@ -29,7 +29,7 @@ export class CartManager{
     async #readCarts() {
         try {
             const cartsJSON = await fs.readFile(this.path, 'utf-8')
-            this.#carts = JSON.parse(cartsJSON)
+            return this.#carts = JSON.parse(cartsJSON)
         } catch (e) {
             this.#carts = await this.#writeCarts();
         }
@@ -54,7 +54,7 @@ export class CartManager{
         const id = await this.getNewCartId()
         const newCart = {id, products:[]}
         this.#carts = await this.getCarts()
-        this.#carts.push(newCart())
+        this.#carts.push(newCart)
         await this.#writeCarts()
         return newCart;
     }
@@ -72,7 +72,7 @@ export class CartManager{
                 cartProducts.products.push({id:product_id, quantity: 1});
             }
             carts[index].products = cartProducts
-            await this.writeCarts()
+            await this.#writeCarts()
             console.log('Producto agregado con exito')
         } else {
             console.log('Carrito no encontrado')
