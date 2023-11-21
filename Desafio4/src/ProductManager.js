@@ -29,7 +29,7 @@ export class Product {
     static newProductId = 1;
   
     constructor(data) {
-        this.path = data.path
+        this.path = data
         this.#products = []
     }
     
