@@ -24,12 +24,21 @@ app.use('/', router);
 
 io.on('connection', socket => {
     console.log('Nuevo cliente conectado');
-    socket.emit ('newProduct', {products: pm.getProducts()})
-
-    socket.on('newProduct', async (producto, callback) => {
-        const respuesta = await pm.addProduct(producto)
-        callback({status: respuesta}) 
-        io.sockets.emit('newProduct', {products: pm.getProducts()})    
+    const productos = async () =>{
+        return await pm.getProducts();
+      }
+      productos()
+    socket.emit ('newProduct', {products: productos()})
+    socket.on('newProduct',  async function(producto) {
+        try{
+            console.log(producto,"algo")
+            await pm.addProduct(producto)
+            const productos = await pm.getProducts()
+            console.log(productos)
+            io.sockets.emit('newProduct', productos)    
+        }   catch(error) {
+            return error
+        }
     });
 });
 

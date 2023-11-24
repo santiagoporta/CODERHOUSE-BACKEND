@@ -1,14 +1,16 @@
 import fs from 'fs/promises'
 
 export class Product {
-  constructor(id, title, description, price, thumbnail, code, stock) {
+  constructor(id, title, description,category, price, thumbnail, code, stock, status) {
     this.id = id;
     this.title = title;
     this.description = description;
+    this.category = category;
     this.price = price;
     this.thumbnail = thumbnail;
     this.code = code ?? this.generarCodeAlAzar();
-    this.stock = stock ;
+    this.stock = stock;
+    this.status = status;
 }
   
     generarCodeAlAzar() {
@@ -43,17 +45,17 @@ export class Product {
         
     }
     
-    validateProductData(data) {
-        if (
-            typeof data.title !== 'string' ||
-            typeof data.description !== 'string' ||
-            typeof data.price !== 'number' ||
-            typeof data.thumbnail !== 'string' ||
-            typeof data.stock !== 'number'
-            ) {
-                throw new Error('Un campo del producto es incorrecto');
-            }
-        }
+    // validateProductData(data) {
+    //     if (
+    //         typeof data.title !== 'string' ||
+    //         typeof data.description !== 'string' ||
+    //         typeof data.price !== 'number' ||
+    //         typeof data.thumbnail !== 'string' ||
+    //         typeof data.stock !== 'number'
+    //         ) {
+    //             throw new Error('Un campo del producto es incorrecto');
+    //         }
+    //     }
         
         async #readProducts() {
           try{
@@ -74,7 +76,7 @@ export class Product {
             // this.validateProductData(data);
             await this.#readProducts()
             const productId = this.getNewProductId()
-            const product = new Product( productId, data.title, data.description, data.price, data.thumbnail, data.stock )
+            const product = new Product( productId, data.title, data.description, data.category, data.price, data.thumbnail,data.code, data.stock, data.status)
             this.#products.push(product)
             await this.#writeProducts()
             return product}

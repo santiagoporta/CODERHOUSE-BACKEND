@@ -1,18 +1,14 @@
 <div id="productList">
     <h1>Productos por webSockets</h1>
-    <form action="/api/products" method="post">
-        <input type="text" name="title" placeholder="title">
-        <input type="text" name="description" placeholder="description">
-        <input type="text" name="category" placeholder="category">
-        <input type="number" name="price" placeholder="price">
-        <input type="text" name="image" placeholder="image">
-        <input type="text" name="code" placeholder="code">
-        <input type="text" name="stock" placeholder="stock">
-        <input type="text" name="status" placeholder="status">
-        <button>ACEPTAR</button>
-    </form>
-    <input type="text" name="random" placeholder="random">
-    <button id="boton">AGREGAR</button>
+        <input type="text" name="title" id="title" placeholder="title" value="">
+        <input type="text" name="description" id="description" placeholder="description" value="">
+        <input type="text" name="category" id="category" placeholder="category" value="">
+        <input type="number" name="price" id="price" placeholder="price" value="">
+        <input type="text" name="thumbnail" id="thumbnail" placeholder="thumbnail" value="">
+        <input type="text" name="code" id="code" placeholder="code" value="">
+        <input type="number" name="stock" id="stock" placeholder="stock" value="">
+        <input type="text" name="status" id="status" placeholder="status" value="">
+        <button id="boton">AGREGAR</button>
     {{#each products}}
     <div id="product-{{this.id}}">
         <p>-----------------------------------------</p>
@@ -30,4 +26,4 @@
     {{/each}}
 </div>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/index.js"></script>
+<script src="/public/js/index.js"></script>
