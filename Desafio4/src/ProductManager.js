@@ -8,7 +8,7 @@ export class Product {
     this.price = price;
     this.thumbnail = thumbnail;
     this.code = code ?? this.generarCodeAlAzar();
-    this.stock = stock ?? 50;
+    this.stock = stock ;
 }
   
     generarCodeAlAzar() {
@@ -70,13 +70,17 @@ export class Product {
         }
         
         async addProduct(data) {
-            this.validateProductData(data);
+          try {
+            // this.validateProductData(data);
             await this.#readProducts()
             const productId = this.getNewProductId()
             const product = new Product( productId, data.title, data.description, data.price, data.thumbnail, data.stock )
             this.#products.push(product)
             await this.#writeProducts()
-            return product
+            return product}
+            catch(e) {
+              console.log(e, "error")
+            }
         }
         
         async getProducts() {

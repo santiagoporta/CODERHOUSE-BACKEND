@@ -9,17 +9,17 @@ const server = app.listen(8080, () => {
     console.log('escuchando en puerto 8080!')
   })
 const io = new IOServer(server);
-const pm = new ProductManager('./db/products.json');
+const pm = new ProductManager('Desafio4/db/products.json');
 
 app.use(express.json());
 app.use(urlencoded({extended: true}));
 
 
 app.engine('handlebars', handlebars.engine());
-app.set('views', './views');
+app.set('views', 'Desafio4/views');
 app.set('view engine', 'handlebars');
 
-app.use('/public',express.static('./public'))
+app.use('/public',express.static('Desafio4/public'))
 app.use('/', router);
 
 io.on('connection', socket => {
@@ -34,7 +34,7 @@ io.on('connection', socket => {
 });
 
 
-
+export {pm}
 export function getIO() {
     return io;
 }

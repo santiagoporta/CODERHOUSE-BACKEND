@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { productManager } from '../app.js'
+import { pm } from '../app.js'
 
 const productsRouter = Router()
 
@@ -8,7 +8,7 @@ const productsRouter = Router()
 productsRouter.get('/', async(req,res)=>{
     try{
         const{limit} = req.query;
-        const products = await productManager.getProducts()
+        const products = await pm.getProducts()
 
         if(limit){
             const limitedProducts = products.slice(0,limit)
@@ -23,7 +23,7 @@ productsRouter.get('/', async(req,res)=>{
 productsRouter.get('/:pid', async(req,res)=>{
     const {pid} = req.params;
     try{
-        const products = await productManager.getElementById(pid)
+        const products = await pm.getElementById(pid)
         res.json(products)
     } catch(error) {
         console.log(error)
@@ -33,8 +33,9 @@ productsRouter.get('/:pid', async(req,res)=>{
 
 productsRouter.post('/', async(req,res)=>{
     try{    
+        console.log(req.body)
         const {title, description, price, thumbnail, stock, status = true, category} = req.body;
-        const response = await productManager.addProduct({title,description, price, thumbnail, stock, status, category})
+        const response = await pm.addProduct({title,description, price, thumbnail, stock, status, category})
         res.json(response)
     } catch(error){
         console.log(error)
@@ -46,7 +47,7 @@ productsRouter.put('/:pid', async(req,res)=>{
     const {pid} = req.params; 
     try{    
         const {title, description, price, thumbnail, stock, status = true, category} = req.body;
-        const response = await productManager.updateProduct(pid, {title,description, price, thumbnail, stock, status, category})
+        const response = await pm.updateProduct(pid, {title,description, price, thumbnail, stock, status, category})
         res.json(response)
     } catch(error){
         console.log(error)
@@ -57,7 +58,7 @@ productsRouter.put('/:pid', async(req,res)=>{
 productsRouter.delete('/:pid', async(req,res)=>{
     const {pid} = req.params;
     try{    
-        await productManager.deleteProduct(id)
+        await pm.deleteProduct(id)
         res.send('Producto eliminado')
     } catch(error){
         console.log(error)
